@@ -1,0 +1,15 @@
+# dependências e build
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# segredos e arquivos locais (nunca subir para o GitHub)
+.env
+.env.*
+!.env.example
+.vercel
+
+# sistema
+.DS_Store

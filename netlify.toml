@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build"
+
+[build.environment]
+  # Next.js 14 precisa de Node 18.17 ou superior
+  NODE_VERSION = "20"
