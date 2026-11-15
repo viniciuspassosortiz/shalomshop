@@ -113,7 +113,7 @@ export default function Store() {
 
       <header className="top">
         <div className="wrap">
-          <a className="logo-s" href="#"><Mark size={34} /><b>ShalomShop</b></a>
+          <a className="logo-s" href="#"><img src="/logo-shalomshop.jpg" alt="ShalomShop" className="logo-img" /></a>
           <button className="cart-btn" aria-label="Abrir carrinho" onClick={() => setSheet("cart")}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M6 7h13l-1.6 8.2a2 2 0 0 1-2 1.6H9.2a2 2 0 0 1-2-1.6L5.4 4H3" /><circle cx="10" cy="20" r="1.2" /><circle cx="17" cy="20" r="1.2" />
@@ -125,8 +125,7 @@ export default function Store() {
 
       <section className="hero">
         <div className="wrap">
-          <Mark size={104} className="mark" />
-          <h1>ShalomShop</h1>
+          <img src="/logo-shalomshop.jpg" alt="ShalomShop" className="hero-logo" />
           <div className="sub">Variedades</div>
           <p>Limpeza, vassouras e rodos, panos, papelaria e muito mais. Escolha seus produtos, envie o pedido e combinamos tudo pelo WhatsApp.</p>
           <div className="badges">
