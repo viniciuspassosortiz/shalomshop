@@ -26,7 +26,6 @@ export default function Store() {
   const [cat, setCat] = useState("Todos");
   const [q, setQ] = useState("");
   const [sheet, setSheet] = useState<"" | "cart" | "checkout" | "done">("");
-  const [delivery, setDelivery] = useState<DeliveryType>("retirada");
   const [form, setForm] = useState({ name: "", phone: "", street: "", number: "", neighborhood: "", reference: "", notes: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -67,7 +66,9 @@ export default function Store() {
   }, [shown]);
 
   const st: Settings = settings ?? { whatsapp: "", delivery_enabled: true, delivery_fee: 0, min_order: 0, store_open: true };
-  const isDelivery = delivery === "entrega" && st.delivery_enabled;
+  // só entrega: o pedido é sempre de entrega, quando a loja estiver fazendo entregas
+  const delivery: DeliveryType = "entrega";
+  const isDelivery = st.delivery_enabled;
   const tot = totals(cart, products, st, isDelivery);
   const missingMin = Math.max(0, st.min_order - tot.subtotal);
   const qtyOf = (id: string) => cart.find((l) => l.id === id)?.qty ?? 0;
@@ -224,19 +225,13 @@ export default function Store() {
                         </div>
                       );
                     })}
-                    <div className="seg" role="group" aria-label="Como receber">
-                      <button className={delivery === "retirada" ? "on" : ""} onClick={() => setDelivery("retirada")}>Retirar<small>sem taxa</small></button>
-                      <button className={isDelivery ? "on" : ""} disabled={!st.delivery_enabled} onClick={() => setDelivery("entrega")}>
-                        Entrega<small>{st.delivery_enabled ? (st.delivery_fee > 0 ? `+ ${brl(st.delivery_fee)}` : "grátis") : "indisponível"}</small>
-                      </button>
-                    </div>
-                    <div className="sum">
-                      <div><span>Produtos</span><span>{brl(tot.subtotal)}</span></div>
-                      {isDelivery && <div><span>Entrega</span><span>{brl(tot.fee)}</span></div>}
-                      <div className="tot"><span>Total</span><span>{brl(tot.total)}</span></div>
+                    <div className="note">
+                      {st.delivery_enabled
+                        ? `Entrega no seu endereço${st.delivery_fee > 0 ? ` · taxa ${brl(st.delivery_fee)}` : " · sem taxa"}.`
+                        : "No momento não estamos fazendo entregas."}
                     </div>
                     {missingMin > 0 && <div className="note">Pedido mínimo de {brl(st.min_order)}. Faltam {brl(missingMin)}.</div>}
-                    <button className="btn block" disabled={missingMin > 0 || !st.store_open} onClick={() => setSheet("checkout")}>Continuar</button>
+                    <button className="btn block" disabled={missingMin > 0 || !st.store_open || !st.delivery_enabled} onClick={() => setSheet("checkout")}>Continuar</button>
                   </>
                 )}
               </>
@@ -273,7 +268,7 @@ export default function Store() {
                   <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} maxLength={300} style={{ minHeight: 56 }} />
                 </label>
                 <div className="sum">
-                  <div><span>{tot.count} {tot.count === 1 ? "item" : "itens"} · {isDelivery ? "Entrega" : "Retirada"}</span><span>{brl(tot.subtotal)}</span></div>
+                  <div><span>{tot.count} {tot.count === 1 ? "item" : "itens"} · Entrega</span><span>{brl(tot.subtotal)}</span></div>
                   {isDelivery && <div><span>Entrega</span><span>{brl(tot.fee)}</span></div>}
                   <div className="tot"><span>Total</span><span>{brl(tot.total)}</span></div>
                 </div>
