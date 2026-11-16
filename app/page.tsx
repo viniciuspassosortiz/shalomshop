@@ -15,7 +15,7 @@ const CART_KEY = "ss-cart";
 const readLS = (k: string) => { try { return localStorage.getItem(k); } catch { return null; } };
 const writeLS = (k: string, v: string) => { try { localStorage.setItem(k, v); } catch { /* ignora */ } };
 
-type Done = { code: string; total: number; name: string; delivery: DeliveryType; lines: { name: string; qty: number; price: number }[]; fee: number };
+type Done = { code: string; total: number; name: string; phone: string; address: string; notes: string; delivery: DeliveryType; lines: { name: string; qty: number; price: number }[]; fee: number };
 
 export default function Store() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -84,7 +84,7 @@ export default function Store() {
     try {
       const lines = cart.map((l) => { const p = byId.get(l.id)!; return { name: p.name, qty: l.qty, price: p.price }; });
       const r = await placeOrder({ name: form.name.trim(), phone: onlyDigits(form.phone), delivery: isDelivery ? "entrega" : "retirada", address: isDelivery ? fullAddress() : "", notes: form.notes.trim(), items: cart });
-      setDone({ code: r.code, total: r.total || tot.total, name: form.name.trim(), delivery: isDelivery ? "entrega" : "retirada", lines, fee: tot.fee });
+      setDone({ code: r.code, total: r.total || tot.total, name: form.name.trim(), phone: form.phone, address: isDelivery ? fullAddress() : "", notes: form.notes.trim(), delivery: isDelivery ? "entrega" : "retirada", lines, fee: tot.fee });
       setCart([]);
       setSheet("done");
       // estoque mudou: recarrega
@@ -104,7 +104,24 @@ export default function Store() {
 
   function waText(d: Done) {
     const items = d.lines.map((l) => `• ${l.qty}x ${l.name} — ${brl(l.price * l.qty)}`).join("\n");
-    return `Olá! Fiz o pedido *${d.code}* na ShalomShop.\n\n${items}\n\n${d.delivery === "entrega" ? `Entrega: taxa ${brl(d.fee)}\n` : "Retirada na loja\n"}*Total: ${brl(d.total)}*\nNome: ${d.name}\n\nPodem me confirmar o pagamento e ${d.delivery === "entrega" ? "a entrega" : "a retirada"}? Obrigado!`;
+    const lines = [
+      `Olá! Fiz o pedido *${d.code}* na ShalomShop.`,
+      "",
+      "*Produtos:*",
+      items,
+      "",
+      d.delivery === "entrega" ? `Entrega: ${d.fee > 0 ? brl(d.fee) : "sem taxa"}` : "",
+      `*Total: ${brl(d.total)}*`,
+      "",
+      "*Meus dados:*",
+      `Nome: ${d.name}`,
+      `Telefone: ${d.phone}`,
+      d.delivery === "entrega" ? `Endereço: ${d.address}` : "",
+      d.notes ? `Observações: ${d.notes}` : "",
+      "",
+      "Podem me confirmar o pagamento e a entrega? Obrigado!",
+    ];
+    return lines.filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n");
   }
 
   return (
